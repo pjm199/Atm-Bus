@@ -6,8 +6,14 @@ import './App.css'
 function App() {
   const [count, setCount] = useState(0)
   const [secondCount, setSecondCount] = useState(0)
+  const [swipeCount, setSwipeCount] = useState(0)
+  const [swipeDirection, setSwipeDirection] = useState('')
+  const [showToast, setShowToast] = useState(false)
 
   useEffect(() => {
+    let touchStartX = 0
+    let touchEndX = 0
+
     const handleTouchStart = (e) => {
       const touch = e.touches[0]
       touchStartX = touch.clientX
@@ -20,16 +26,17 @@ function App() {
 
     const handleTouchEnd = () => {
       if (touchStartX - touchEndX > 50) {
-        setCount((count) => count - 1)
+        setSwipeCount((count) => count - 1)
+        setSwipeDirection('left')
       }
 
       if (touchEndX - touchStartX > 50) {
-        setCount((count) => count + 1)
+        setSwipeCount((count) => count + 1)
+        setSwipeDirection('right')
       }
-    }
 
-    let touchStartX = 0
-    let touchEndX = 0
+      setTimeout(() => setSwipeDirection(''), 500)
+    }
 
     const counterElement = document.querySelector('.swipe-counter')
     counterElement.addEventListener('touchstart', handleTouchStart)
@@ -43,6 +50,17 @@ function App() {
     }
   }, [])
 
+  const handleSave = () => {
+    const data = {
+      count,
+      secondCount,
+      date: new Date().toLocaleString()
+    }
+    console.log('Saved Data:', JSON.stringify(data))
+    setShowToast(true)
+    setTimeout(() => setShowToast(false), 3000)
+  }
+
   return (
     <>
       <div>
@@ -53,7 +71,7 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      
+      <h1>Vite + React</h1>
       <div className="card">
         <div className="counter">
           <button onClick={() => setCount((count) => count + 1)}> + </button>
@@ -71,11 +89,13 @@ function App() {
           </div>
           <button onClick={() => setSecondCount((secondCount) => secondCount - 1)}> - </button>
         </div>
-        <div className="swipe-counter">
+        <div className={`swipe-counter ${swipeDirection}`}>
           <label>Swipe Counter</label>
-          <span className="counter-button">{count}</span>
+          <span className="counter-button">{swipeCount}</span>
         </div>
-        
+        <button onClick={handleSave} className="save-button">Save</button>
+        {showToast && <div className="toast">Data has been saved!</div>}
+       
       </div>
       
     </>

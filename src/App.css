@@ -79,6 +79,57 @@
   min-width: 50px;
 }
 
+.card .swipe-counter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  padding: 20px;
+  border: 2px solid #007bff;
+  border-radius: 10px;
+  background-color:rgb(192, 171, 31);
+}
+
+.card .swipe-counter.right {
+  background-color: #28a745;
+  transform: translateX(20px);
+}
+
+.card .swipe-counter.left {
+  background-color: #dc3545;
+  transform: translateX(-20px);
+}
+
+.save-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #ffc107;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.save-button:hover {
+  background-color:rgb(16, 127, 53);
+}
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #28a745;
+  color: white;
+  padding: 15px 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+  font-weight: bold;
+  z-index: 1000;
+  opacity: 0.9;
+}
+
 .read-the-docs {
   color: #888;
 }
