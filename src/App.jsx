@@ -55,7 +55,7 @@ function App() {
   const handleStart = () => {
     setDataVector([])
     setShowToast(true)
-    setToastMessage('Vector initialized!')
+    setToastMessage('Partenza Corsa!')
     setTimeout(() => setShowToast(false), 3000)
   }
 
@@ -72,6 +72,11 @@ function App() {
     setTimeout(() => setShowToast(false), 3000)
   }
 
+  const handleEnd = () => {
+    console.log('End button clicked')
+    // Add any additional logic for the End button here
+  }
+
   return (
     <>
       <div>
@@ -82,9 +87,9 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      
+      <h1>AMT</h1>
       <div className="card">
-        <button onClick={handleStart} className="start-button">Start</button>
+        <button onClick={handleStart} className="start-button">Inizia Corsa</button>
         <div className="counter">
           <button onClick={() => setCount((count) => count - 1)}> - </button>
           <div className="counter-display">
@@ -117,6 +122,7 @@ function App() {
             ))}
           </ul>
         </div>
+        <button onClick={handleEnd} className="end-button">Capolinea</button>
         
       </div>
       

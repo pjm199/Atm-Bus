@@ -124,8 +124,23 @@
   border-radius: 5px;
   cursor: pointer;
 }
+
 .save-button:hover {
-  background-color:rgb(16, 127, 53);
+  background-color: rgb(16, 127, 53);
+}
+
+.end-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.end-button:hover {
+  background-color: #c82333;
 }
 
 .toast {
@@ -160,7 +175,7 @@
 }
 
 .data-vector li {
-  background-color:rgb(84, 112, 140);
+  background-color:rgb(48, 96, 145);
   padding: 10px;
   margin-bottom: 5px;
   border-radius: 5px;
