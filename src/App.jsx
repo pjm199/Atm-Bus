@@ -9,6 +9,8 @@ function App() {
   const [swipeCount, setSwipeCount] = useState(0)
   const [swipeDirection, setSwipeDirection] = useState('')
   const [showToast, setShowToast] = useState(false)
+  const [toastMessage, setToastMessage] = useState('')
+  const [dataVector, setDataVector] = useState([])
 
   useEffect(() => {
     let touchStartX = 0
@@ -50,6 +52,13 @@ function App() {
     }
   }, [])
 
+  const handleStart = () => {
+    setDataVector([])
+    setShowToast(true)
+    setToastMessage('Vector initialized!')
+    setTimeout(() => setShowToast(false), 3000)
+  }
+
   const handleSave = () => {
     const data = {
       count,
@@ -57,6 +66,8 @@ function App() {
       date: new Date().toLocaleString()
     }
     console.log('Saved Data:', JSON.stringify(data))
+    setDataVector((prevVector) => [...prevVector, data])
+    setToastMessage(`Data has been saved!<br>OUT: ${count}<br>IN: ${secondCount}<br>Date: ${data.date}`)
     setShowToast(true)
     setTimeout(() => setShowToast(false), 3000)
   }
@@ -71,31 +82,42 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>Vite + React</h1>
+      
       <div className="card">
+        <button onClick={handleStart} className="start-button">Start</button>
         <div className="counter">
-          <button onClick={() => setCount((count) => count + 1)}> + </button>
+          <button onClick={() => setCount((count) => count - 1)}> - </button>
           <div className="counter-display">
             <label>OUT</label>
             <span className="counter-button">{count}</span>
           </div>
-          <button onClick={() => setCount((count) => count - 1)}> - </button>
+          <button onClick={() => setCount((count) => count + 1)}> + </button>
         </div>
         <div className="counter">
-          <button onClick={() => setSecondCount((secondCount) => secondCount + 1)}> + </button>
+          <button onClick={() => setSecondCount((secondCount) => secondCount - 1)}> - </button>
           <div className="counter-display">
             <label>IN</label>
             <span className="counter-button">{secondCount}</span>
           </div>
-          <button onClick={() => setSecondCount((secondCount) => secondCount - 1)}> - </button>
+          <button onClick={() => setSecondCount((secondCount) => secondCount + 1)}> + </button>
         </div>
+        <label>Swipe Counter</label>
         <div className={`swipe-counter ${swipeDirection}`}>
-          <label>Swipe Counter</label>
           <span className="counter-button">{swipeCount}</span>
         </div>
         <button onClick={handleSave} className="save-button">Save</button>
-        {showToast && <div className="toast">Data has been saved!</div>}
-       
+        {showToast && <div className="toast" dangerouslySetInnerHTML={{ __html: toastMessage }}></div>}
+        <div className="data-vector">
+          <h3>Saved Data:</h3>
+          <ul>
+            {dataVector.map((data, index) => (
+              <li key={index}>
+                OUT: {data.count}, IN: {data.secondCount}, Date: {data.date}
+              </li>
+            ))}
+          </ul>
+        </div>
+        
       </div>
       
     </>
