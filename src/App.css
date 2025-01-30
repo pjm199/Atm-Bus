@@ -35,6 +35,9 @@
 
 .card {
   padding: 2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .card div {
@@ -101,8 +104,14 @@
   transform: translateX(-20px);
 }
 
-.start-button {
+.start-container {
+  display: flex;
+  align-items: center;
   margin-bottom: 20px;
+}
+
+.start-button {
+  margin-right: 20px;
   padding: 10px 20px;
   background-color: #007bff;
   color: white;
@@ -113,6 +122,12 @@
 
 .start-button:hover {
   background-color: #0056b3;
+}
+
+.select-option {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .save-button {
@@ -163,6 +178,7 @@
 
 .data-vector {
   margin-top: 20px;
+  width: 100%;
 }
 
 .data-vector h3 {
@@ -180,6 +196,30 @@
   margin-bottom: 5px;
   border-radius: 5px;
   border: 1px solid #ddd;
+}
+
+.data-vector table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-vector th, .data-vector td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.data-vector th {
+  background-color:rgb(13, 67, 38);
+  font-weight: bold;
+}
+
+.data-vector tr:nth-child(even) {
+  background-color:rgb(55, 88, 177);
+}
+
+.data-vector tr:hover {
+  background-color:rgb(60, 190, 207);
 }
 
 .read-the-docs {

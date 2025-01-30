@@ -1,61 +1,32 @@
 import { useState, useEffect } from 'react'
+import * as XLSX from 'xlsx'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
+
+
 function App() {
   const [count, setCount] = useState(0)
   const [secondCount, setSecondCount] = useState(0)
-  const [swipeCount, setSwipeCount] = useState(0)
-  const [swipeDirection, setSwipeDirection] = useState('')
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
-  const [dataVector, setDataVector] = useState([])
+  const [savedDataVector, setSavedDataVector] = useState([])
+  const [excelDataVector, setExcelDataVector] = useState([])
+  const [selectedOption, setSelectedOption] = useState('')
+  const [options, setOptions] = useState([])
 
   useEffect(() => {
-    let touchStartX = 0
-    let touchEndX = 0
-
-    const handleTouchStart = (e) => {
-      const touch = e.touches[0]
-      touchStartX = touch.clientX
-    }
-
-    const handleTouchMove = (e) => {
-      const touch = e.touches[0]
-      touchEndX = touch.clientX
-    }
-
-    const handleTouchEnd = () => {
-      if (touchStartX - touchEndX > 50) {
-        setSwipeCount((count) => count - 1)
-        setSwipeDirection('left')
-      }
-
-      if (touchEndX - touchStartX > 50) {
-        setSwipeCount((count) => count + 1)
-        setSwipeDirection('right')
-      }
-
-      setTimeout(() => setSwipeDirection(''), 500)
-    }
-
-    const counterElement = document.querySelector('.swipe-counter')
-    counterElement.addEventListener('touchstart', handleTouchStart)
-    counterElement.addEventListener('touchmove', handleTouchMove)
-    counterElement.addEventListener('touchend', handleTouchEnd)
-
-    return () => {
-      counterElement.removeEventListener('touchstart', handleTouchStart)
-      counterElement.removeEventListener('touchmove', handleTouchMove)
-      counterElement.removeEventListener('touchend', handleTouchEnd)
-    }
+    fetch('/api/excel-files')
+      .then(response => response.json())
+      .then(data => setOptions(data))
+      .catch(error => console.error('Error fetching Excel files:', error))
   }, [])
 
   const handleStart = () => {
-    setDataVector([])
+    setSavedDataVector([])
     setShowToast(true)
-    setToastMessage('Partenza Corsa!')
+    setToastMessage('Vector initialized!')
     setTimeout(() => setShowToast(false), 3000)
   }
 
@@ -63,11 +34,14 @@ function App() {
     const data = {
       count,
       secondCount,
-      date: new Date().toLocaleString()
+      time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit' }),
+      selectedOption
     }
     console.log('Saved Data:', JSON.stringify(data))
-    setDataVector((prevVector) => [...prevVector, data])
-    setToastMessage(`Data has been saved!<br>OUT: ${count}<br>IN: ${secondCount}<br>Date: ${data.date}`)
+    setSavedDataVector((prevVector) => [...prevVector, data])
+    setToastMessage(`Data has been saved!<br>OUT: ${count}<br>IN: ${secondCount}<br>Time: ${data.time}`)
     setShowToast(true)
     setTimeout(() => setShowToast(false), 3000)
   }
@@ -75,6 +49,44 @@ function App() {
   const handleEnd = () => {
     console.log('End button clicked')
     // Add any additional logic for the End button here
+  }
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0]
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      try {
+        const data = new Uint8Array(event.target.result)
+        const workbook = XLSX.read(data, { type: 'array' })
+        const sheetName = workbook.SheetNames[0]
+        const worksheet = workbook.Sheets[sheetName]
+
+        
+        const json = XLSX.utils.sheet_to_json(worksheet)
+
+        const formattedJson = json.map(row => {
+          const previstoTime = XLSX.SSF.parse_date_code(row.Previsto)
+        console.log("dsadsadsadsa\n", previstoTime)
+          const date = new Date(0, 0, 
+            previstoTime.d, 
+            previstoTime.H, 
+            previstoTime.M, 
+            previstoTime.S)
+          return {
+            ...row,
+            Previsto: date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit'})
+          }
+        })
+        setExcelDataVector(formattedJson)
+        console.log('Excel Data:', formattedJson)
+      } catch (error) {
+        console.error('Error reading Excel file:', error)
+        setToastMessage(`Error reading Excel file: ${error.message}`)
+        setShowToast(true)
+        setTimeout(() => setShowToast(false), 3000)
+      }
+    }
+    reader.readAsArrayBuffer(file)
   }
 
   return (
@@ -87,9 +99,17 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>AMT</h1>
+      
       <div className="card">
-        <button onClick={handleStart} className="start-button">Inizia Corsa</button>
+        <div className="start-container">
+          <button onClick={handleStart} className="start-button">Inizia Corsa</button>
+          <select value={selectedOption} onChange={(e) => setSelectedOption(e.target.value)} className="select-option">
+            <option value="" disabled>Select an option</option>
+            {options.map(option => (
+              <option key={option.fileName} value={option.value}>{option.value}</option>
+            ))}
+          </select>
+        </div>
         <div className="counter">
           <button onClick={() => setCount((count) => count - 1)}> - </button>
           <div className="counter-display">
@@ -106,26 +126,57 @@ function App() {
           </div>
           <button onClick={() => setSecondCount((secondCount) => secondCount + 1)}> + </button>
         </div>
-        <label>Swipe Counter</label>
-        <div className={`swipe-counter ${swipeDirection}`}>
-          <span className="counter-button">{swipeCount}</span>
-        </div>
         <button onClick={handleSave} className="save-button">Save</button>
+        <input type="file" onChange={handleFileUpload} />
         {showToast && <div className="toast" dangerouslySetInnerHTML={{ __html: toastMessage }}></div>}
         <div className="data-vector">
           <h3>Saved Data:</h3>
-          <ul>
-            {dataVector.map((data, index) => (
-              <li key={index}>
-                OUT: {data.count}, IN: {data.secondCount}, Date: {data.date}
-              </li>
-            ))}
-          </ul>
+          <table>
+            <thead>
+              <tr>
+                <th>Previsto</th>
+                <th>Reale</th>
+                <th>Saliti</th>
+                <th>Scesi</th>
+                <th>A Bordo</th>
+              </tr>
+            </thead>
+            <tbody>
+              {savedDataVector.map((data, index) => (
+                <tr key={index}>
+                  <td>{data.time}</td>
+                  <td>{data.time}</td>
+                  <td>{data.secondCount}</td>
+                  <td>{data.count}</td>
+                  <td>{data.secondCount - data.count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="data-vector">
+          <h3>Excel Data:</h3>
+          <table>
+            <thead>
+              <tr>
+                {excelDataVector.length > 0 && Object.keys(excelDataVector[0]).map((key, index) => (
+                  <th key={index}>{key}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {excelDataVector.map((data, index) => (
+                <tr key={index}>
+                  {Object.values(data).map((value, i) => (
+                    <td key={i}>{value}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
         <button onClick={handleEnd} className="end-button">Capolinea</button>
-        
       </div>
-      
     </>
   )
 }
