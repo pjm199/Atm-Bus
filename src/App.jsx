@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import * as XLSX from 'xlsx'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
+import ExcelFileSelector from "./ExcelFileSelector";
+import ExcelReader from "./ExcelReader";
 import './App.css'
 
 
@@ -15,6 +17,7 @@ function App() {
   const [excelDataVector, setExcelDataVector] = useState([])
   const [selectedOption, setSelectedOption] = useState('')
   const [options, setOptions] = useState([])
+  const [selectedFile, setSelectedFile] = useState("");
 
   useEffect(() => {
     fetch('/api/excel-files')
@@ -99,7 +102,11 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      
+      <div>
+      <h1>Excel File Reader</h1>
+      <ExcelFileSelector onSelectFile={setSelectedFile} />
+      {selectedFile && <ExcelReader fileName={`${selectedFile}.xlsx`} />}
+    </div>
       <div className="card">
         <div className="start-container">
           <button onClick={handleStart} className="start-button">Inizia Corsa</button>
