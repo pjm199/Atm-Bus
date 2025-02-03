@@ -1,12 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import * as XLSX from 'xlsx'
 import reactLogo from './assets/react.svg'
+import AMTlogo from './assets/AMT-logo.png'
 import viteLogo from '/vite.svg'
-import ExcelFileSelector from "./ExcelFileSelector";
-import ExcelReader from "./ExcelReader";
+import ExcelFileSelector from "./components/ExcelFileSelector"
 import './App.css'
-
-
 
 function App() {
   const [count, setCount] = useState(0)
@@ -17,45 +15,14 @@ function App() {
   const [excelDataVector, setExcelDataVector] = useState([])
   const [selectedOption, setSelectedOption] = useState('')
   const [options, setOptions] = useState([])
-  const [selectedFile, setSelectedFile] = useState("");
+  const [selectedFile, setSelectedFile] = useState('')
 
-  useEffect(() => {
-    fetch('/api/excel-files')
-      .then(response => response.json())
-      .then(data => setOptions(data))
-      .catch(error => console.error('Error fetching Excel files:', error))
+  const handleSelectFile = useCallback((file) => {
+    setSelectedFile(file)
+    readExcelFile(file)
   }, [])
 
-  const handleStart = () => {
-    setSavedDataVector([])
-    setShowToast(true)
-    setToastMessage('Vector initialized!')
-    setTimeout(() => setShowToast(false), 3000)
-  }
-
-  const handleSave = () => {
-    const data = {
-      count,
-      secondCount,
-      time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', 
-      minute: '2-digit', 
-      second: '2-digit' }),
-      selectedOption
-    }
-    console.log('Saved Data:', JSON.stringify(data))
-    setSavedDataVector((prevVector) => [...prevVector, data])
-    setToastMessage(`Data has been saved!<br>OUT: ${count}<br>IN: ${secondCount}<br>Time: ${data.time}`)
-    setShowToast(true)
-    setTimeout(() => setShowToast(false), 3000)
-  }
-
-  const handleEnd = () => {
-    console.log('End button clicked')
-    // Add any additional logic for the End button here
-  }
-
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0]
+  const readExcelFile = (file) => {
     const reader = new FileReader()
     reader.onload = (event) => {
       try {
@@ -63,25 +30,9 @@ function App() {
         const workbook = XLSX.read(data, { type: 'array' })
         const sheetName = workbook.SheetNames[0]
         const worksheet = workbook.Sheets[sheetName]
-
-        
         const json = XLSX.utils.sheet_to_json(worksheet)
-
-        const formattedJson = json.map(row => {
-          const previstoTime = XLSX.SSF.parse_date_code(row.Previsto)
-        console.log("dsadsadsadsa\n", previstoTime)
-          const date = new Date(0, 0, 
-            previstoTime.d, 
-            previstoTime.H, 
-            previstoTime.M, 
-            previstoTime.S)
-          return {
-            ...row,
-            Previsto: date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit'})
-          }
-        })
-        setExcelDataVector(formattedJson)
-        console.log('Excel Data:', formattedJson)
+        setExcelDataVector(json)
+        console.log('Excel Data:', json)
       } catch (error) {
         console.error('Error reading Excel file:', error)
         setToastMessage(`Error reading Excel file: ${error.message}`)
@@ -92,48 +43,119 @@ function App() {
     reader.readAsArrayBuffer(file)
   }
 
+  useEffect(() => {
+    fetch('/api/excel-files')
+      .then(response => response.json())
+      .then(data => setOptions(data))
+      .catch(error => console.error('Error fetching Excel files:', error))
+  }, [])
+
+  const handleStart = () => {
+    setCount(0)
+    setSecondCount(0)
+    setSavedDataVector([])
+    setShowToast(true)
+    setToastMessage('Corsa Iniziata!')
+    setTimeout(() => setShowToast(false), 3000)
+  }
+
+  const handleSaveStop = () => {
+    const data = {
+      count,
+      secondCount,
+      time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      selectedOption
+    }
+    console.log('Saved Data:', JSON.stringify(data))
+
+    setSavedDataVector((prevVector) => [...prevVector, data])
+
+    setToastMessage(`Fermata Salvata!<br>
+                      OUT: ${count}<br>
+                      IN: ${secondCount}<br>
+                      Time: ${data.time}`)
+    setShowToast(true)
+    setTimeout(() => setShowToast(false), 2000)
+    setCount(0)
+    setSecondCount(0)
+  }
+
+  const handleCapolinea = () => {
+    const worksheet = XLSX.utils.json_to_sheet(savedDataVector)
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Saved Data')
+    XLSX.writeFile(workbook, 'saved_data.xlsx')
+    console.log('Capolina, Dati salvati su file Excel')
+  }
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0]
+    readExcelFile(file)
+  }
+
+  const incrementCount = () => {
+    setCount((prevCount) => Math.min(prevCount + 1, 100))
+  }
+
+  const decrementCount = () => {
+    setCount((prevCount) => Math.max(prevCount - 1, 0))
+  }
+
+  const incrementSecondCount = () => {
+    setSecondCount((prevCount) => Math.min(prevCount + 1, 100))
+  }
+
+  const decrementSecondCount = () => {
+    setSecondCount((prevCount) => Math.max(prevCount - 1, 0))
+  }
+
+  const calculateABordo = () => {
+    return savedDataVector.reduce((acc, data) => acc + data.secondCount - data.count, 0)
+  }
+
+  const aBordo = calculateABordo()
+
   return (
     <>
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
+        <a href="https://www.amt.genova.it/amt/" target="_blank">
+          <img src={AMTlogo} className="logo react" alt="AMT logo" />
         </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <h2 className='logo-react'>AMT Linee Bus</h2>
       </div>
-      <div>
-      <h1>Excel File Reader</h1>
-      <ExcelFileSelector onSelectFile={setSelectedFile} />
-      {selectedFile && <ExcelReader fileName={`${selectedFile}.xlsx`} />}
-    </div>
+
+      <ExcelFileSelector onSelectFile={handleSelectFile} />
+
+      
+      
       <div className="card">
         <div className="start-container">
           <button onClick={handleStart} className="start-button">Inizia Corsa</button>
-          <select value={selectedOption} onChange={(e) => setSelectedOption(e.target.value)} className="select-option">
-            <option value="" disabled>Select an option</option>
-            {options.map(option => (
-              <option key={option.fileName} value={option.value}>{option.value}</option>
-            ))}
-          </select>
-        </div>
-        <div className="counter">
-          <button onClick={() => setCount((count) => count - 1)}> - </button>
-          <div className="counter-display">
-            <label>OUT</label>
-            <span className="counter-button">{count}</span>
+          
+          <div className="a-bordo">
+            <label>A Bordo:</label>
+            <span>{aBordo}</span>
           </div>
-          <button onClick={() => setCount((count) => count + 1)}> + </button>
         </div>
-        <div className="counter">
-          <button onClick={() => setSecondCount((secondCount) => secondCount - 1)}> - </button>
-          <div className="counter-display">
-            <label>IN</label>
-            <span className="counter-button">{secondCount}</span>
+        <div className="counter-container">
+          <div className="counter">
+            <button onClick={incrementCount}> + </button>
+            <div className="counter-display">
+              <label>OUT</label>
+              <span className="counter-button">{count}</span>
+            </div>
+            <button onClick={decrementCount}> - </button>
           </div>
-          <button onClick={() => setSecondCount((secondCount) => secondCount + 1)}> + </button>
+          <div className="counter">
+            <button onClick={incrementSecondCount}> + </button>
+            <div className="counter-display">
+              <label>IN</label>
+              <span className="counter-button">{secondCount}</span>
+            </div>
+            <button onClick={decrementSecondCount}> - </button>
+          </div>
         </div>
-        <button onClick={handleSave} className="save-button">Save</button>
+        <button onClick={handleSaveStop} className="save-button">Save</button>
         <input type="file" onChange={handleFileUpload} />
         {showToast && <div className="toast" dangerouslySetInnerHTML={{ __html: toastMessage }}></div>}
         <div className="data-vector">
@@ -149,15 +171,20 @@ function App() {
               </tr>
             </thead>
             <tbody>
-              {savedDataVector.map((data, index) => (
-                <tr key={index}>
-                  <td>{data.time}</td>
-                  <td>{data.time}</td>
-                  <td>{data.secondCount}</td>
-                  <td>{data.count}</td>
-                  <td>{data.secondCount - data.count}</td>
-                </tr>
-              ))}
+              {savedDataVector.reduce((acc, data, index) => {
+                const previousABordo = acc.length > 0 ? acc[acc.length - 1].props.children[4].props.children : 0
+                const currentABordo = previousABordo + data.secondCount - data.count
+                acc.push(
+                  <tr key={index}>
+                    <td>{data.time}</td>
+                    <td>{data.time}</td>
+                    <td>{data.secondCount}</td>
+                    <td>{data.count}</td>
+                    <td>{currentABordo}</td>
+                  </tr>
+                )
+                return acc
+              }, [])}
             </tbody>
           </table>
         </div>
@@ -182,7 +209,7 @@ function App() {
             </tbody>
           </table>
         </div>
-        <button onClick={handleEnd} className="end-button">Capolinea</button>
+        <button onClick={handleCapolinea} className="end-button">Capolinea</button>
       </div>
     </>
   )

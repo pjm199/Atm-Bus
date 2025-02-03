@@ -1,0 +1,9 @@
+
+
+<select value={selectedOption} onChange={(e) => setSelectedOption(e.target.value)} className="select-option">
+<option value="" disabled>Select an option</option>
+{options.map(option => (
+  <option key={option.fileName} value={option.value}>{option.value}</option>
+))}
+</select>
+
