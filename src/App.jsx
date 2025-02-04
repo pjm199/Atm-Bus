@@ -86,7 +86,8 @@ function App() {
       count,
       secondCount,
       time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-      selectedOption
+      selectedOption,
+      previsto: excelDataVector[savedDataVector.length]?.Previsto || 'N/A' // Get the Previsto time sequentially
     }
     console.log('Saved Data:', JSON.stringify(data))
 
@@ -185,6 +186,7 @@ function App() {
           <table>
             <thead>
               <tr>
+                <th>Fermata</th>
                 <th>Previsto</th>
                 <th>Reale</th>
                 <th>Saliti</th>
@@ -194,11 +196,12 @@ function App() {
             </thead>
             <tbody>
               {savedDataVector.reduce((acc, data, index) => {
-                const previousABordo = acc.length > 0 ? acc[acc.length - 1].props.children[4].props.children : 0
+                const previousABordo = acc.length > 0 ? acc[acc.length - 1].props.children[5].props.children : 0
                 const currentABordo = previousABordo + data.secondCount - data.count
                 acc.push(
                   <tr key={index}>
-                    <td>{data.time}</td>
+                    <td>{excelDataVector[index]?.Fermata || 'N/A'}</td>
+                    <td>{data.previsto}</td>
                     <td>{data.time}</td>
                     <td>{data.secondCount}</td>
                     <td>{data.count}</td>
