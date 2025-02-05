@@ -12,7 +12,7 @@ const ExcelFileSelector = ({ onSelectFile }) => {
         const data = await response.json();
         setFiles(data.files);
       } catch (error) {
-        console.error("Error fetching Excel files:", error);
+        console.error("ERRORE lettura Excel files:", error);
       }
     };
 
@@ -26,9 +26,8 @@ const ExcelFileSelector = ({ onSelectFile }) => {
 
   return (
     <div>
-      <label htmlFor="file-selector">Seleziona una Linea </label>
       <select id="file-selector" onChange={handleFileChange}>
-        <option value="">BUS N.</option>
+        <option value="">LINEA N.</option>
         {files.map((file, index) => (
           <option key={index} value={file}>
             {file}

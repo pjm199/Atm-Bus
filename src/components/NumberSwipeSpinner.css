@@ -1,0 +1,15 @@
+.spinner-roller {
+  width: 220px;
+  height: 50px;
+  margin: auto;
+  border-radius: 10px;
+  border: 2px solid #007bff;
+  background-color:rgb(26, 148, 154);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  transition: transform 0.3s ease;
+  /* Prevent default touch behavior so the page doesn't slide horizontally */
+  touch-action: none;
+}

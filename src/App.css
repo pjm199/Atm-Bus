@@ -3,8 +3,19 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  margin-left: auto;
+  margin-right: auto;
 }
-
+body {
+  overflow-x: hidden;
+  text-align: center;
+}
+.AppSwipingSpinner {
+  max-width: 800px; /* or whatever maximum width you need */
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 20px; /* optional padding */
+}
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -111,7 +122,8 @@
 }
 
 .start-button {
-  margin-right: 20px;
+  marginBottom: '30px',
+  margin: '0 auto',
   padding: 10px 20px;
   background-color:rgb(26, 217, 93);
   color: white;
@@ -318,4 +330,31 @@
   padding: 5px 10px;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.a-bordo span:hover {
+  background-color:rgb(219, 107, 32);
+}
+
+.salitiscesi{
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 50px;
+  margin: 10px;
+}
+
+.AppSpinner {
+  display: grid;
+  width: 280px; /* or whatever maximum width you need */
+  margin-left: auto;
+  margin-right: auto;
+  background-color:rgb(17, 36, 55);
+  space-between: 20px;
+}
+.file-selector {
+  justify-content: center;
+  align-items: center;
+  marginButton: 20px;
 }

@@ -4,9 +4,16 @@ import reactLogo from './assets/react.svg'
 import AMTlogo from './assets/AMT-logo.png'
 import viteLogo from '/vite.svg'
 import ExcelFileSelector from "./components/ExcelFileSelector"
+import NumberSpinner from './components/NumberSpinner';
+import NumberSwipeSpinner from './components/NumberSwipeSpinner';
 import './App.css'
 
 function App() {
+  const [spinnerValue, setSpinnerValue] = useState(0);
+
+  const [scesi, setScesi] = useState(0);
+  const [saliti, setSaliti] = useState(0);
+
   const [count, setCount] = useState(0)
   const [secondCount, setSecondCount] = useState(0)
 
@@ -144,16 +151,61 @@ function App() {
         <a href="https://www.amt.genova.it/amt/" target="_blank">
           <img src={AMTlogo} className="logo react" alt="AMT logo" />
         </a>
-        <h2 className='logo-react'>AMT Linee Bus</h2>
       </div>
-
-      <ExcelFileSelector onSelectFile={handleSelectFile} />
-
+      <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '20px', 
+                    border: '1px solid #ccc',
+                    borderRadius: '5px',
+                    width: '300px', 
+                    justifyContent: 'center', 
+                    marginBottom: '30px',
+                    margin: '0 auto',
+                    backgroundColor: 'rgb(17, 36, 55)',
+                  }}>
+          <h2 style={{ margin: 0 }}>AMT Linee</h2>
+          <ExcelFileSelector onSelectFile={handleSelectFile} />
+      </div>
+      <div style={{ margin: '20px 0' }}>
+          <button onClick={handleStart} className="start-button">Inizia Corsa</button>
+      </div>
       
-      
+      <div className="AppSpinner" style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '10px', marginBottom: '10px' }}>
+        <h2>Scesi</h2>
+        <div style={{ marginBottom: '20px' }}>
+          <NumberSpinner
+            value={scesi}
+            onChange={setScesi}
+            min={0}
+            max={100}
+          />
+        </div>
+        <h2>Saliti</h2>
+        <div>
+          <NumberSpinner
+            value={saliti}
+            onChange={setSaliti}
+            min={0}
+            max={100}
+          />
+          <p>-----</p>
+        </div>
+      </div>
+      <div>
+
+      <h2 style={{border: '2px solid #ccc', 
+                      margin: '0 auto',
+                      width: '280px',
+                      padding: '10px', 
+                      borderRadius: '10px', 
+                      marginBottom: '10px' }}
+                      >A Bordo : {aBordo}
+          </h2>
+      </div>
       <div className="card">
         <div className="start-container">
-          <button onClick={handleStart} className="start-button">Inizia Corsa</button>
+          
           
           <div className="a-bordo">
             <label>A Bordo:</label>
