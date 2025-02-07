@@ -4,14 +4,14 @@
   border: 3px solid #ccc;
   border-radius: 5px;
   overflow: hidden;
-  width: 140px;
+  width: 250px;
   background-color: rgb(198, 111, 11);
   margin: 0 auto; /* centers the spinner */
 }
 
 .spinner-button {
   background-color:rgb(14, 23, 192);
-  color: rgb(219, 224, 74);
+  color:white;
   border: none;
   padding: 10px;
   font-size: 18px;
@@ -32,20 +32,20 @@
   border: none;
   text-align: center;
   width: 60px;
-  font-size: 18px;
-  padding: 5px;
-  border-radius: 3px;
+  font-size: 24px;
+  padding: 7px;
+  border-radius: 5px;
 }
 
 /* Mobile-friendly adjustments */
 @media (max-width: 480px) {
   .spinner-container {
-    width: 120px;
+    width: 180px;
   }
   .spinner-button {
     padding: 8px;
-    font-size: 16px;
-    width: 35px;
+    font-size: 24px;
+    width: 55px;
   }
   .spinner-input {
     width: 50px;

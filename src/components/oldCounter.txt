@@ -1,0 +1,40 @@
+  const incrementCount = () => {
+    setCount((prevCount) => Math.min(prevCount + 1, 100))
+  }
+
+  const decrementCount = () => {
+    setCount((prevCount) => Math.max(prevCount - 1, 0))
+  }
+
+  const incrementSecondCount = () => {
+    setSecondCount((prevCount) => Math.min(prevCount + 1, 100))
+  }
+
+  const decrementSecondCount = () => {
+    setSecondCount((prevCount) => Math.max(prevCount - 1, 0))
+  }
+
+
+<div className="card">
+        <div className="start-container">
+                  
+        </div>
+        <div className="counter-container">
+          <div className="counter">
+            <button onClick={incrementCount}> + </button>
+            <div className="counter-display">
+              <label>OUT</label>
+              <span className="counter-button">{count}</span>
+            </div>
+            <button onClick={decrementCount}> - </button>
+          </div>
+          <div className="counter">
+            <button onClick={incrementSecondCount}> + </button>
+            <div className="counter-display">
+              <label>IN</label>
+              <span className="counter-button">{secondCount}</span>
+            </div>
+            <button onClick={decrementSecondCount}> - </button>
+          </div>
+        </div>
+        </div>

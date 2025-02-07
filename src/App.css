@@ -17,7 +17,7 @@ body {
   padding: 0 20px; /* optional padding */
 }
 .logo {
-  height: 6em;
+  height: 3em;
   padding: 1.5em;
   will-change: filter;
   transition: filter 300ms;
@@ -190,7 +190,7 @@ body {
 
 .data-vector {
   margin-top: 20px;
-  width: 100%;
+  width: 400px;
 }
 
 .data-vector h3 {
@@ -211,7 +211,7 @@ body {
 }
 
 .data-vector table {
-  width: 100%;
+  width: 400px;
   border-collapse: collapse;
 }
 

@@ -1,19 +1,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import * as XLSX from 'xlsx'
-import reactLogo from './assets/react.svg'
+
 import AMTlogo from './assets/AMT-logo.png'
-import viteLogo from '/vite.svg'
+
 import ExcelFileSelector from "./components/ExcelFileSelector"
 import NumberSpinner from './components/NumberSpinner';
-import NumberSwipeSpinner from './components/NumberSwipeSpinner';
+
 import './App.css'
 
 function App() {
-  const [spinnerValue, setSpinnerValue] = useState(0);
-
-  const [scesi, setScesi] = useState(0);
-  const [saliti, setSaliti] = useState(0);
-
   const [count, setCount] = useState(0)
   const [secondCount, setSecondCount] = useState(0)
 
@@ -26,6 +21,11 @@ function App() {
   const [selectedOption, setSelectedOption] = useState('')
   const [options, setOptions] = useState([])
   const [selectedFile, setSelectedFile] = useState('')
+
+  const [currentFermata, setCurrentFermata] = useState('')
+  const [currentDenominazione, setCurrentDenominazione] = useState('')
+  const [currentPrevisto, setCurrentPrevisto] = useState('')
+  const [currentIndex, setCurrentIndex] = useState(0)
 
   const handleSelectFile = useCallback((file) => {
     setSelectedFile(file)
@@ -86,6 +86,10 @@ function App() {
     setShowToast(true)
     setToastMessage('Corsa Iniziata!')
     setTimeout(() => setShowToast(false), 3000)
+    setCurrentIndex(0) // Reset index to 0
+    setCurrentFermata(excelDataVector[0]?.Fermata || 'N/A')
+    setCurrentDenominazione(excelDataVector[0]?.Denominazione || 'N/A')
+    setCurrentPrevisto(excelDataVector[0]?.Previsto || 'N/A')  
   }
 
   const handleSaveStop = () => {
@@ -94,26 +98,31 @@ function App() {
       secondCount,
       time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
       selectedOption,
-      previsto: excelDataVector[savedDataVector.length]?.Previsto || 'N/A' // Get the Previsto time sequentially
+      previsto: excelDataVector[savedDataVector.length]?.Previsto || 'N/A' 
     }
+
     console.log('Saved Data:', JSON.stringify(data))
 
     setSavedDataVector((prevVector) => [...prevVector, data])
 
     setToastMessage(`Fermata Salvata!<br>
-                      OUT: ${count}<br>
-                      IN: ${secondCount}<br>
-                      Time: ${data.time}`)
+                      Ora: ${data.time}`)
     setShowToast(true)
     setTimeout(() => setShowToast(false), 2000)
     setCount(0)
     setSecondCount(0)
+    // Update current values to the next index
+  const nextIndex = currentIndex + 1
+  setCurrentIndex(nextIndex)
+  setCurrentFermata(excelDataVector[nextIndex]?.Fermata || 'N/A')
+  setCurrentDenominazione(excelDataVector[nextIndex]?.Denominazione || 'N/A')
+  setCurrentPrevisto(excelDataVector[nextIndex]?.Previsto || 'N/A')
   }
 
   const handleCapolinea = () => {
     const worksheet = XLSX.utils.json_to_sheet(savedDataVector)
     const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Saved Data')
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Fermate Salvate')
     XLSX.writeFile(workbook, 'saved_data.xlsx')
     console.log('Capolina, Dati salvati su file Excel')
   }
@@ -123,21 +132,7 @@ function App() {
     readExcelFile(file)
   }
 
-  const incrementCount = () => {
-    setCount((prevCount) => Math.min(prevCount + 1, 100))
-  }
 
-  const decrementCount = () => {
-    setCount((prevCount) => Math.max(prevCount - 1, 0))
-  }
-
-  const incrementSecondCount = () => {
-    setSecondCount((prevCount) => Math.min(prevCount + 1, 100))
-  }
-
-  const decrementSecondCount = () => {
-    setSecondCount((prevCount) => Math.max(prevCount - 1, 0))
-  }
 
   const calculateABordo = () => {
     return savedDataVector.reduce((acc, data) => acc + data.secondCount - data.count, 0)
@@ -167,16 +162,32 @@ function App() {
           <h2 style={{ margin: 0 }}>AMT Linee</h2>
           <ExcelFileSelector onSelectFile={handleSelectFile} />
       </div>
+
+      <input type="file" onChange={handleFileUpload} />
+
       <div style={{ margin: '20px 0' }}>
           <button onClick={handleStart} className="start-button">Inizia Corsa</button>
       </div>
       
+      <h2 style={{border: '2px solid #ccc', 
+                      margin: '0 auto',
+                      width: '280px',
+                      padding: '10px', 
+                      borderRadius: '10px', 
+                      marginBottom: '10px',
+                      color :'#fff',
+                      backgroundColor: 'rgb(18, 76, 134)',
+                      marginTop: '10px' }}>
+        {currentDenominazione}
+      </h2>
+      
+
       <div className="AppSpinner" style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '10px', marginBottom: '10px' }}>
         <h2>Scesi</h2>
         <div style={{ marginBottom: '20px' }}>
           <NumberSpinner
-            value={scesi}
-            onChange={setScesi}
+            value={count}
+            onChange={setCount}
             min={0}
             max={100}
           />
@@ -184,8 +195,8 @@ function App() {
         <h2>Saliti</h2>
         <div>
           <NumberSpinner
-            value={saliti}
-            onChange={setSaliti}
+            value={secondCount}
+            onChange={setSecondCount}
             min={0}
             max={100}
           />
@@ -193,48 +204,31 @@ function App() {
         </div>
       </div>
       <div>
-
+      
+      <button style={{border: '2px solid #ccc', 
+                      margin: '0 auto',
+                      width: '300px',
+                      padding: '10px', 
+                      borderRadius: '10px', 
+                      marginBottom: '10px',
+                      marginTop: '10px' }} onClick={handleSaveStop} className="save-button">Salva Fermata</button>
+      
       <h2 style={{border: '2px solid #ccc', 
                       margin: '0 auto',
                       width: '280px',
                       padding: '10px', 
                       borderRadius: '10px', 
-                      marginBottom: '10px' }}
+                      marginBottom: '10px',
+                      color :'#fff',
+                      backgroundColor: 'rgb(18, 76, 134)',
+                      marginTop: '10px' }}
                       >A Bordo : {aBordo}
           </h2>
       </div>
-      <div className="card">
-        <div className="start-container">
-          
-          
-          <div className="a-bordo">
-            <label>A Bordo:</label>
-            <span>{aBordo}</span>
-          </div>
-        </div>
-        <div className="counter-container">
-          <div className="counter">
-            <button onClick={incrementCount}> + </button>
-            <div className="counter-display">
-              <label>OUT</label>
-              <span className="counter-button">{count}</span>
-            </div>
-            <button onClick={decrementCount}> - </button>
-          </div>
-          <div className="counter">
-            <button onClick={incrementSecondCount}> + </button>
-            <div className="counter-display">
-              <label>IN</label>
-              <span className="counter-button">{secondCount}</span>
-            </div>
-            <button onClick={decrementSecondCount}> - </button>
-          </div>
-        </div>
-        <button onClick={handleSaveStop} className="save-button">Save</button>
-        <input type="file" onChange={handleFileUpload} />
-        {showToast && <div className="toast" dangerouslySetInnerHTML={{ __html: toastMessage }}></div>}
+  
+      {showToast && <div className="toast" dangerouslySetInnerHTML={{ __html: toastMessage }}></div>}
         <div className="data-vector">
-          <h3>Saved Data:</h3>
+          <h3>Fermate Salvate</h3>
           <table>
             <thead>
               <tr>
@@ -243,7 +237,7 @@ function App() {
                 <th>Reale</th>
                 <th>Saliti</th>
                 <th>Scesi</th>
-                <th>A Bordo</th>
+                <th>Bordo</th>
               </tr>
             </thead>
             <tbody>
@@ -266,7 +260,7 @@ function App() {
           </table>
         </div>
         <div className="data-vector">
-          <h3>Excel Data:</h3>
+          <h3>Lista Fermate caricate da File Excel</h3>
           <table>
             <thead>
               <tr>
@@ -287,7 +281,7 @@ function App() {
           </table>
         </div>
         <button onClick={handleCapolinea} className="end-button">Capolinea</button>
-      </div>
+      
     </>
   )
 }
