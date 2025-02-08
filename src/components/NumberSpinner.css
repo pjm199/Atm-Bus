@@ -2,10 +2,10 @@
   display: flex;
   align-items: center;
   border: 3px solid #ccc;
-  border-radius: 5px;
+  border-radius: 3px;
   overflow: hidden;
   width: 250px;
-  background-color: rgb(198, 111, 11);
+  background-color: rgb(253, 130, 4);
   margin: 0 auto; /* centers the spinner */
 }
 

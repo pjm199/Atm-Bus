@@ -26,9 +26,11 @@ function App() {
   const [currentDenominazione, setCurrentDenominazione] = useState('')
   const [currentPrevisto, setCurrentPrevisto] = useState('')
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [selectedFileName, setSelectedFileName] = useState('')
 
   const handleSelectFile = useCallback((file) => {
     setSelectedFile(file)
+    setSelectedFileName(file.name) // Set the selected file name
     readExcelFile(file)
   }, [])
 
@@ -45,6 +47,7 @@ function App() {
         // Convert the array of arrays to an array of objects
         const headers = json[0]
         const rows = json.slice(1)
+
         const formattedData = rows.map(row => {
           const rowData = {}
           row.forEach((cell, index) => {
@@ -62,6 +65,7 @@ function App() {
 
         setExcelDataVector(formattedData)
         console.log('Excel Data:', formattedData)
+
       } catch (error) {
         console.error('Error reading Excel file:', error)
         setToastMessage(`Error reading Excel file: ${error.message}`)
@@ -70,7 +74,7 @@ function App() {
       }
     }
     reader.readAsArrayBuffer(file)
-  }
+  } // End of readExcelFile
 
   useEffect(() => {
     fetch('/api/excel-files')
@@ -132,21 +136,20 @@ function App() {
     readExcelFile(file)
   }
 
-
-
   const calculateABordo = () => {
     return savedDataVector.reduce((acc, data) => acc + data.secondCount - data.count, 0)
   }
 
   const aBordo = calculateABordo()
 
-  return (
+  return ( // JSX --------
     <>
       <div>
         <a href="https://www.amt.genova.it/amt/" target="_blank">
           <img src={AMTlogo} className="logo react" alt="AMT logo" />
         </a>
       </div>
+
       <div style={{ 
                     display: 'flex', 
                     alignItems: 'center', 
@@ -162,28 +165,57 @@ function App() {
           <h2 style={{ margin: 0 }}>AMT Linee</h2>
           <ExcelFileSelector onSelectFile={handleSelectFile} />
       </div>
+      {selectedFileName && (
+          <div style={{ textAlign: 'center', marginBottom: '20px', color: '#fff' 
 
+      }}>
+        <p>Selected File: {selectedFileName}</p>
+  </div>
+)}
       <input type="file" onChange={handleFileUpload} />
 
-      <div style={{ margin: '20px 0' }}>
-          <button onClick={handleStart} className="start-button">Inizia Corsa</button>
+      <div>
+          <button style={{border: '3px solid #ccc', 
+                      margin: '0 auto',
+                      width: '200px',
+                      padding: '10px', 
+                      borderRadius: '10px', 
+                      marginBottom: '20px',
+                      marginTop: '20px' }}
+          onClick={handleStart} 
+          className="start-button">Inizia Corsa</button>
       </div>
       
-      <h2 style={{border: '2px solid #ccc', 
+      <h2 style={{border: '3px solid #ccc', 
                       margin: '0 auto',
                       width: '280px',
                       padding: '10px', 
                       borderRadius: '10px', 
                       marginBottom: '10px',
                       color :'#fff',
-                      backgroundColor: 'rgb(18, 76, 134)',
+                      backgroundColor: 'rgb(0, 102, 128)',
                       marginTop: '10px' }}>
         {currentDenominazione}
       </h2>
       
+      <h2 style={{border: '3px solid #ccc', 
+                      margin: '0 auto',
+                      width: '200px',
+                      padding: '10px', 
+                      borderRadius: '10px', 
+                      marginBottom: '10px',
+                      color :'rgb(0, 102, 128)',
+                      backgroundColor: 'rgb(253, 130, 4)',
+                      marginTop: '20px',
+                      }}
+                      >A Bordo : {aBordo}
+      </h2>
 
-      <div className="AppSpinner" style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '10px', marginBottom: '10px' }}>
-        <h2>Scesi</h2>
+      <div className="AppSpinner" style={{ border: '3px solid #ccc', 
+                                          padding: '10px', 
+                                          borderRadius: '10px', 
+                                          marginBottom: '10px' }}>
+        <h2 style={{color :'rgb(253, 130, 4)'}}>Scesi</h2>
         <div style={{ marginBottom: '20px' }}>
           <NumberSpinner
             value={count}
@@ -192,7 +224,7 @@ function App() {
             max={100}
           />
         </div>
-        <h2>Saliti</h2>
+        <h2 style={{color :'rgb(253, 130, 4)'}}>Saliti</h2>
         <div>
           <NumberSpinner
             value={secondCount}
@@ -205,25 +237,15 @@ function App() {
       </div>
       <div>
       
-      <button style={{border: '2px solid #ccc', 
+      <button style={{border: '3px solid #ccc', 
                       margin: '0 auto',
-                      width: '300px',
+                      width: '200px',
                       padding: '10px', 
                       borderRadius: '10px', 
                       marginBottom: '10px',
                       marginTop: '10px' }} onClick={handleSaveStop} className="save-button">Salva Fermata</button>
       
-      <h2 style={{border: '2px solid #ccc', 
-                      margin: '0 auto',
-                      width: '280px',
-                      padding: '10px', 
-                      borderRadius: '10px', 
-                      marginBottom: '10px',
-                      color :'#fff',
-                      backgroundColor: 'rgb(18, 76, 134)',
-                      marginTop: '10px' }}
-                      >A Bordo : {aBordo}
-          </h2>
+      
       </div>
   
       {showToast && <div className="toast" dangerouslySetInnerHTML={{ __html: toastMessage }}></div>}
@@ -259,6 +281,9 @@ function App() {
             </tbody>
           </table>
         </div>
+
+        <button onClick={handleCapolinea} className="end-button">Capolinea</button>
+        
         <div className="data-vector">
           <h3>Lista Fermate caricate da File Excel</h3>
           <table>
@@ -280,7 +305,7 @@ function App() {
             </tbody>
           </table>
         </div>
-        <button onClick={handleCapolinea} className="end-button">Capolinea</button>
+        
       
     </>
   )

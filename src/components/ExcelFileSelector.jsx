@@ -10,6 +10,7 @@ const ExcelFileSelector = ({ onSelectFile }) => {
         const response = await fetch("/api/list-excel");
         if (!response.ok) throw new Error("Failed to fetch files");
         const data = await response.json();
+        console.log("data.files", data.files);
         setFiles(data.files);
       } catch (error) {
         console.error("ERRORE lettura Excel files:", error);
@@ -27,7 +28,7 @@ const ExcelFileSelector = ({ onSelectFile }) => {
   return (
     <div>
       <select id="file-selector" onChange={handleFileChange}>
-        <option value="">LINEA N.</option>
+        <option value="">Seleziona N.</option>
         {files.map((file, index) => (
           <option key={index} value={file}>
             {file}
